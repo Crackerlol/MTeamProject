@@ -1,24 +1,31 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from datetime import datetime, timedelta
+
+from aiogram.types import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton
+)
 
 
 def get_date_keyboard():
-    dates = [
-        ("12 июля", "date_12"),
-        ("13 июля", "date_13"),
-        ("14 июля", "date_14"),
-    ]
-
     keyboard = []
 
-    for text, callback in dates:
-        keyboard.append([
-            InlineKeyboardButton(
-                text=text,
-                callback_data=callback
-            )
-        ])
+    for i in range(3):
+        date = datetime.now() + timedelta(days=i)
 
-    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+        date_text = date.strftime("%d.%m")
+
+        keyboard.append(
+            [
+                InlineKeyboardButton(
+                    text=date_text,
+                    callback_data=f"date_{date_text}"
+                )
+            ]
+        )
+
+    return InlineKeyboardMarkup(
+        inline_keyboard=keyboard
+    )
 
 
 def get_time_keyboard():
@@ -33,11 +40,48 @@ def get_time_keyboard():
     keyboard = []
 
     for time in times:
-        keyboard.append([
-            InlineKeyboardButton(
-                text=time,
-                callback_data=f"time_{time}"
-            )
-        ])
+        keyboard.append(
+            [
+                InlineKeyboardButton(
+                    text=time,
+                    callback_data=f"time_{time}"
+                )
+            ]
+        )
 
-    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+    return InlineKeyboardMarkup(
+        inline_keyboard=keyboard
+    )
+
+
+def get_confirm_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Подтвердить бронирование ✅",
+                    callback_data="confirm_booking"
+                )
+            ]
+        ]
+    )
+
+
+def get_cancel_keyboard(
+        bookings
+):
+    keyboard = []
+
+    for booking_id, date, time in bookings:
+        keyboard.append(
+            [
+                InlineKeyboardButton(
+                    text=f"{date} {time} ❌",
+                    callback_data=f"cancel_{booking_id}"
+                )
+            ]
+        )
+
+    return InlineKeyboardMarkup(
+        inline_keyboard=keyboard
+    )
