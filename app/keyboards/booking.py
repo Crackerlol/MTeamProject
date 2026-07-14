@@ -12,7 +12,7 @@ def get_date_keyboard():
     for i in range(3):
         date = datetime.now() + timedelta(days=i)
 
-        date_text = date.strftime("%d.%m")
+        date_text = date.strftime("%d.%m.%Y")
 
         keyboard.append(
             [
@@ -67,9 +67,7 @@ def get_confirm_keyboard():
     )
 
 
-def get_cancel_keyboard(
-        bookings
-):
+def get_cancel_keyboard(bookings):
     keyboard = []
 
     for booking_id, date, time in bookings:

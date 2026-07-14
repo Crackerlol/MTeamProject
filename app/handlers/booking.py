@@ -29,18 +29,10 @@ async def choose_date(
         callback: CallbackQuery,
         state: FSMContext
 ):
-    date = callback.data.replace(
-        "date_",
-        ""
-    )
+    date = callback.data.replace("date_", "")
 
-    await state.update_data(
-        date=date
-    )
-
-    await state.set_state(
-        BookingState.choosing_time
-    )
+    await state.update_data(date=date)
+    await state.set_state(BookingState.choosing_time)
 
     await callback.message.edit_text(
         "Выберите время:",
@@ -55,15 +47,9 @@ async def choose_time(
         callback: CallbackQuery,
         state: FSMContext
 ):
-    time = callback.data.replace(
-        "time_",
-        ""
-    )
+    time = callback.data.replace("time_", "")
 
-    await state.update_data(
-        time=time
-    )
-
+    await state.update_data(time=time)
     data = await state.get_data()
 
     await callback.message.edit_text(
@@ -76,18 +62,19 @@ async def choose_time(
     await callback.answer()
 
 
-@router.callback_query(
-    F.data == "confirm_booking"
-)
+@router.callback_query(F.data == "confirm_booking")
 async def confirm_booking(
         callback: CallbackQuery,
         state: FSMContext
 ):
     data = await state.get_data()
 
-    user_id = await get_user_id(
-        callback.from_user.id
-    )
+    user_id = await get_user_id(callback.from_user.id)
+
+    if user_id is None:
+        await callback.message.answer("Ошибка пользователя.")
+        await state.clear()
+        return
 
     result = await create_booking(
         user_id=user_id,
@@ -99,7 +86,6 @@ async def confirm_booking(
         await callback.message.edit_text(
             "✅ Бронирование успешно создано!"
         )
-
     else:
         await callback.message.edit_text(
             "❌ Это время уже занято."
@@ -109,27 +95,19 @@ async def confirm_booking(
     await callback.answer()
 
 
-@router.callback_query(
-    F.data.startswith("cancel_")
-)
+@router.callback_query(F.data.startswith("cancel_"))
 async def cancel_user_booking(
         callback: CallbackQuery
 ):
-    booking_id = int(
-        callback.data.replace(
-            "cancel_",
-            ""
-        )
-    )
+    booking_id = int(callback.data.replace("cancel_", ""))
 
-    user_id = await get_user_id(
-        callback.from_user.id
-    )
+    user_id = await get_user_id(callback.from_user.id)
 
-    await cancel_booking(
-        booking_id,
-        user_id
-    )
+    if user_id is None:
+        await callback.message.answer("Ошибка пользователя.")
+        return
+
+    await cancel_booking(booking_id, user_id)
 
     await callback.message.edit_text(
         "✅ Бронирование отменено."
