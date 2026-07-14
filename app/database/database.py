@@ -80,20 +80,25 @@ async def get_user_bookings(
 
 async def cancel_booking(
         booking_id: int,
-        user_id: int
+        user_id: int | None
 ):
     async with aiosqlite.connect(DATABASE_PATH) as db:
-        await db.execute(
-            """
-            DELETE FROM bookings
-            WHERE id = ?
-            AND user_id = ?
-            """,
-            (
-                booking_id,
-                user_id
+        if user_id is not None:
+            await db.execute(
+                """
+                DELETE FROM bookings
+                WHERE id = ? AND user_id = ?
+                """,
+                (booking_id, user_id)
             )
-        )
+        else:
+            await db.execute(
+                """
+                DELETE FROM bookings
+                WHERE id = ?
+                """,
+                (booking_id,)
+            )
 
         await db.commit()
 

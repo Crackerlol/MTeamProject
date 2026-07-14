@@ -200,8 +200,20 @@ async def admin_cancel_booking(callback: CallbackQuery):
 
     await cancel_booking(booking_id, user_id=None)
 
-    await callback.message.edit_text(
-        "❌ Бронирование удалено администратором."
-    )
+    # обновляем список
+    bookings = await get_all_bookings()
+
+    if not bookings:
+        await callback.message.edit_text("Нет бронирований.")
+    else:
+        text = "Все бронирования:\n\n"
+
+        for _, user, date, time in bookings:
+            text += f"{user} | {date} {time}\n"
+
+        await callback.message.edit_text(
+            text,
+            reply_markup=get_admin_cancel_keyboard(bookings)
+        )
 
     await callback.answer()
