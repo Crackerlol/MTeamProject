@@ -271,8 +271,8 @@ python bot.py
 
 ---
 
- 🧠 Автор
+ 🧠 Авторы
 
-Разработка: команда MTeamProject
+Команда MTeamProject
 
 ---
